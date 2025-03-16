@@ -1,0 +1,1924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigiReach - Empowering Education for All</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#5D5CDE', /* Purple theme */
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                            950: '#1e1b4b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <style>
+        :root {
+            --ocean-blue: #1a6f8b;
+            --ocean-green: #2daf94;
+            --light-blue: #88c9d9;
+            --light-green: #a8e6cf;
+            --primary-purple: #5D5CDE;
+            --primary-purple-dark: #4338ca;
+        }
+
+        /* Background gradient for light/dark modes */
+        body {
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--light-green) 100%);
+            transition: background 0.3s ease;
+        }
+
+        body.dark {
+            background: linear-gradient(135deg, #0c2a3a 0%, #134e46 100%);
+        }
+
+        /* Particles Background */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        /* Common styles */
+        .popup, .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .popup-content, .modal-content {
+            background-color: white;
+            color: #333;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .dark .popup-content, .dark .modal-content {
+            background-color: #1a2937;
+            color: white;
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .dark .close-btn {
+            color: #ddd;
+        }
+
+        .resource-card:hover {
+            transform: scale(1.03);
+            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .active-section {
+            display: block;
+        }
+
+        /* Custom colors */
+        .bg-ocean-blue {
+            background-color: var(--ocean-blue);
+        }
+
+        .bg-ocean-green {
+            background-color: var(--ocean-green);
+        }
+
+        .bg-light-blue {
+            background-color: var(--light-blue);
+        }
+
+        .bg-light-green {
+            background-color: var(--light-green);
+        }
+
+        .bg-primary-purple {
+            background-color: var(--primary-purple);
+        }
+
+        .text-ocean-blue {
+            color: var(--ocean-blue);
+        }
+
+        .text-ocean-green {
+            color: var(--ocean-green);
+        }
+
+        .text-primary-purple {
+            color: var(--primary-purple);
+        }
+
+        .border-ocean-blue {
+            border-color: var(--ocean-blue);
+        }
+
+        .border-ocean-green {
+            border-color: var(--ocean-green);
+        }
+
+        .border-primary-purple {
+            border-color: var(--primary-purple);
+        }
+
+        .hover\:bg-ocean-blue:hover {
+            background-color: var(--ocean-blue);
+        }
+
+        .hover\:bg-ocean-green:hover {
+            background-color: var(--ocean-green);
+        }
+
+        .hover\:bg-primary-purple:hover {
+            background-color: var(--primary-purple-dark);
+        }
+
+        /* Quiz-specific styles */
+        .quiz-option {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .quiz-option:hover {
+            background-color: rgba(93, 92, 222, 0.1);
+        }
+
+        .quiz-option.selected {
+            background-color: var(--primary-purple);
+            color: white;
+        }
+
+        .quiz-option.correct {
+            background-color: var(--ocean-green);
+            color: white;
+        }
+
+        .quiz-option.incorrect {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        /* Success notification */
+        #success-notification {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            transition: all 0.3s ease;
+            transform: translateY(100px);
+            opacity: 0;
+        }
+
+        #success-notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body class="font-sans min-h-screen text-gray-800 dark:text-white transition-colors duration-300 overflow-x-hidden">
+<!-- Particles Background -->
+<div id="particles-js" class="fixed inset-0 z-0"></div>
+
+<!-- Header -->
+<header class="bg-gradient-to-r from-ocean-blue to-ocean-green text-white shadow-lg sticky top-0 z-50 transition duration-300">
+    <div class="container mx-auto p-4">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <!-- Logo and Title -->
+            <div class="flex items-center mb-4 md:mb-0">
+                <img src="https://th.bing.com/th/id/R.fcd2540ce1a8abaafdcb9239671e04b4?rik=cTrSi9Wvu4CYPQ&pid=ImgRaw&r=0" alt="DigiReach Logo" class="w-12 h-12 mr-3 rounded-full">
+                <div>
+                    <h1 class="text-2xl font-bold">DigiReach</h1>
+                    <p class="text-sm text-gray-200">Empowering education for all</p>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex flex-wrap justify-center gap-2">
+                <button class="nav-button px-4 py-2 bg-white text-ocean-blue hover:bg-light-blue rounded-lg transition-colors duration-200" data-section="home">Home</button>
+                <button class="nav-button px-4 py-2 bg-white text-ocean-blue hover:bg-light-blue rounded-lg transition-colors duration-200" data-section="about">About</button>
+                <button class="nav-button px-4 py-2 bg-white text-ocean-blue hover:bg-light-blue rounded-lg transition-colors duration-200" data-section="resources">Resources</button>
+                <button class="nav-button px-4 py-2 bg-white text-ocean-blue hover:bg-light-blue rounded-lg transition-colors duration-200" data-section="dashboard">Dashboard</button>
+                <button class="nav-button px-4 py-2 bg-white text-ocean-blue hover:bg-light-blue rounded-lg transition-colors duration-200" data-section="quiz">Quiz</button>
+                <button class="contact-btn px-4 py-2 bg-white text-ocean-blue hover:bg-light-blue rounded-lg transition-colors duration-200">Contact</button>
+
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle" class="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors duration-200">
+                    <i class="fas fa-sun text-yellow-300 dark:hidden"></i>
+                    <i class="fas fa-moon text-blue-300 hidden dark:block"></i>
+                </button>
+            </nav>
+        </div>
+
+        <!-- User Profile Area -->
+        <div class="flex justify-end mt-2">
+            <div id="user-profile" class="hidden items-center gap-2">
+                <span id="username-display" class="text-sm"></span>
+                <button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 px-2 py-1 rounded transition-colors">Logout</button>
+            </div>
+            <button id="login-btn" class="text-sm bg-ocean-green hover:bg-green-700 px-3 py-1 rounded transition-colors">Login</button>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="container mx-auto p-4 pb-20 z-10 relative">
+    <!-- Home Section -->
+    <section id="home" class="section active-section bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-80 rounded-lg p-6 shadow-lg mb-8 backdrop-blur-sm">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold mb-4 text-ocean-blue dark:text-light-blue">Welcome to DigiReach</h2>
+            <p class="text-lg max-w-3xl mx-auto dark:text-gray-300">Explore our collection of hand-picked educational resources and tools, designed to help you learn at your own pace and convenience.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div class="bg-gradient-to-b from-light-blue to-light-green dark:from-ocean-blue dark:to-ocean-green p-6 rounded-lg text-center transform hover:scale-105 transition-transform shadow-md">
+                <div class="text-4xl text-primary-purple mb-4"><i class="fas fa-graduation-cap"></i></div>
+                <h3 class="text-xl font-bold mb-2 text-ocean-blue dark:text-white">Learn Anywhere</h3>
+                <p class="text-gray-700 dark:text-gray-200">Access educational resources from anywhere in the world, on any device.</p>
+            </div>
+
+            <div class="bg-gradient-to-b from-light-blue to-light-green dark:from-ocean-blue dark:to-ocean-green p-6 rounded-lg text-center transform hover:scale-105 transition-transform shadow-md">
+                <div class="text-4xl text-primary-purple mb-4"><i class="fas fa-users"></i></div>
+                <h3 class="text-xl font-bold mb-2 text-ocean-blue dark:text-white">Join Community</h3>
+                <p class="text-gray-700 dark:text-gray-200">Connect with learners and educators worldwide for collaborative learning.</p>
+            </div>
+
+            <div class="bg-gradient-to-b from-light-blue to-light-green dark:from-ocean-blue dark:to-ocean-green p-6 rounded-lg text-center transform hover:scale-105 transition-transform shadow-md">
+                <div class="text-4xl text-primary-purple mb-4"><i class="fas fa-book-open"></i></div>
+                <h3 class="text-xl font-bold mb-2 text-ocean-blue dark:text-white">Free Resources</h3>
+                <p class="text-gray-700 dark:text-gray-200">Discover thousands of free learning materials spanning diverse subjects.</p>
+            </div>
+        </div>
+
+        <div class="text-center mt-10">
+            <button class="nav-button px-6 py-3 bg-primary-purple hover:bg-primary-purple-dark text-white rounded-lg text-lg transition-colors duration-200 shadow-md" data-section="resources">Explore Resources</button>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-80 rounded-lg p-6 shadow-lg mb-8 backdrop-blur-sm">
+        <h2 class="text-3xl font-bold mb-6 text-center text-ocean-blue dark:text-light-blue">About DigiReach</h2>
+        <div class="max-w-4xl mx-auto">
+            <p class="mb-6 text-lg text-gray-700 dark:text-gray-200">DigiReach is on a mission to provide free and accessible learning resources to students and educators worldwide. Our vision is to make education more inclusive, regardless of geographical, economic, or social barriers.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                <div class="bg-gradient-to-b from-light-blue to-light-green dark:from-ocean-blue dark:to-ocean-green p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-3 text-ocean-blue dark:text-white"><i class="fas fa-bullseye mr-2 text-primary-purple"></i> Our Mission</h3>
+                    <p class="text-gray-700 dark:text-gray-200">To democratize education by leveraging digital technology to make high-quality educational resources accessible to everyone, everywhere.</p>
+                </div>
+
+                <div class="bg-gradient-to-b from-light-blue to-light-green dark:from-ocean-blue dark:to-ocean-green p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-3 text-ocean-blue dark:text-white"><i class="fas fa-eye mr-2 text-primary-purple"></i> Our Vision</h3>
+                    <p class="text-gray-700 dark:text-gray-200">A world where everyone has equal opportunities to learn, grow, and contribute to society, regardless of their background or circumstances.</p>
+                </div>
+
+                <div class="bg-gradient-to-b from-light-blue to-light-green dark:from-ocean-blue dark:to-ocean-green p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-3 text-ocean-blue dark:text-white"><i class="fas fa-handshake mr-2 text-primary-purple"></i> Our Values</h3>
+                    <p class="text-gray-700 dark:text-gray-200">Accessibility, Quality, Collaboration, Innovation, and Inclusivity form the core values that drive our work.</p>
+                </div>
+
+                <div class="bg-gradient-to-b from-light-blue to-light-green dark:from-ocean-blue dark:to-ocean-green p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-3 text-ocean-blue dark:text-white"><i class="fas fa-history mr-2 text-primary-purple"></i> Our Journey</h3>
+                    <p class="text-gray-700 dark:text-gray-200">Founded in 2022, DigiReach has grown from a small initiative to a global platform serving thousands of learners and educators worldwide.</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-10">
+                <button class="contact-btn px-6 py-3 bg-primary-purple hover:bg-primary-purple-dark text-white rounded-lg text-lg transition-colors duration-200 shadow-md">Get in Touch</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section id="resources" class="section bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-80 rounded-lg p-6 shadow-lg mb-8 backdrop-blur-sm">
+        <h2 class="text-3xl font-bold mb-4 text-center text-ocean-blue dark:text-light-blue">Explore Educational Resources</h2>
+        <p class="text-lg mb-6 text-center text-gray-700 dark:text-gray-200">Discover guides, tutorials, and videos across various subjects to elevate your learning experience.</p>
+
+        <!-- Search and Filter Bar -->
+        <div class="mb-6">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-grow">
+                    <input type="text" id="resource-search" placeholder="Search resources..." class="text-base w-full p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-purple">
+                </div>
+                <div class="flex gap-2">
+                    <select id="category-filter" class="text-base p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-purple">
+                        <option value="all">All Categories</option>
+                        <option value="programming">Programming</option>
+                        <option value="study-skills">Study Skills</option>
+                        <option value="soft-skills">Soft Skills</option>
+                        <option value="science">Science</option>
+                    </select>
+                    <button id="submit-resource-btn" class="px-4 py-2 bg-ocean-green hover:bg-green-700 text-white rounded-lg transition-colors whitespace-nowrap shadow-md">
+                        <i class="fas fa-plus mr-1"></i> Submit Resource
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resource Grid -->
+        <div id="resource-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Resources will be populated here dynamically -->
+        </div>
+
+        <!-- Resource Loading Indicator -->
+        <div id="resource-loading" class="py-10 text-center">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-purple"></div>
+            <p class="mt-3 text-gray-700 dark:text-gray-200">Loading resources...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="no-resources" class="hidden py-10 text-center">
+            <div class="text-5xl mb-4 text-gray-400"><i class="fas fa-search"></i></div>
+            <p class="text-lg text-gray-700 dark:text-gray-200">No resources found matching your criteria.</p>
+            <button id="clear-filters" class="mt-4 px-4 py-2 bg-primary-purple hover:bg-primary-purple-dark text-white rounded-lg transition-colors shadow-md">Clear Filters</button>
+        </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="section bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-80 rounded-lg p-6 shadow-lg mb-8 backdrop-blur-sm">
+        <h2 class="text-3xl font-bold mb-4 text-center text-ocean-blue dark:text-light-blue">Your Learning Dashboard</h2>
+
+        <div id="login-required-message" class="p-6 bg-red-600/30 rounded-lg text-center mb-6">
+            <p class="text-lg text-gray-800 dark:text-white">Please log in to access your dashboard and personalized features.</p>
+            <button id="dashboard-login-btn" class="mt-3 px-4 py-2 bg-ocean-green hover:bg-green-700 text-white rounded-lg transition-colors shadow-md">Login Now</button>
+        </div>
+
+        <div id="dashboard-content" class="hidden">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-gradient-to-b from-light-blue to-light-green dark:from-ocean-blue dark:to-ocean-green p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-3 flex items-center text-ocean-blue dark:text-white">
+                        <i class="fas fa-chart-line mr-2 text-primary-purple"></i> Learning Progress
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-700 dark:text-gray-200">Python Basics</span>
+                                <span class="text-gray-700 dark:text-gray-200">75%</span>
+                            </div>
+                            <div class="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2.5">
+                                <div class="bg-primary-purple h-2.5 rounded-full" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-700 dark:text-gray-200">Web Development</span>
+                                <span class="text-gray-700 dark:text-gray-200">45%</span>
+                            </div>
+                            <div class="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2.5">
+                                <div class="bg-primary-purple h-2.5 rounded-full" style="width: 45%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-700 dark:text-gray-200">Data Science</span>
+                                <span class="text-gray-700 dark:text-gray-200">20%</span>
+                            </div>
+                            <div class="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2.5">
+                                <div class="bg-primary-purple h-2.5 rounded-full" style="width: 20%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-b from-light-blue to-light-green dark:from-ocean-blue dark:to-ocean-green p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-3 flex items-center text-ocean-blue dark:text-white">
+                        <i class="fas fa-bookmark mr-2 text-primary-purple"></i> Saved Resources
+                    </h3>
+                    <div id="saved-resources" class="space-y-3">
+                        <p class="text-gray-700 dark:text-gray-300 italic text-center">No resources saved yet.</p>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-b from-light-blue to-light-green dark:from-ocean-blue dark:to-ocean-green p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-3 flex items-center text-ocean-blue dark:text-white">
+                        <i class="fas fa-tasks mr-2 text-primary-purple"></i> Recent Activity
+                    </h3>
+                    <ul class="space-y-2 text-gray-700 dark:text-gray-200">
+                        <li class="flex items-start">
+                                <span class="text-xs bg-primary-purple rounded-full w-5 h-5 flex items-center justify-center mr-2 mt-0.5">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            <span>Completed Python Loops Module</span>
+                        </li>
+                        <li class="flex items-start">
+                                <span class="text-xs bg-primary-purple rounded-full w-5 h-5 flex items-center justify-center mr-2 mt-0.5">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            <span>Saved 2 Web Development articles</span>
+                        </li>
+                        <li class="flex items-start">
+                                <span class="text-xs bg-primary-purple rounded-full w-5 h-5 flex items-center justify-center mr-2 mt-0.5">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            <span>Started Data Science introduction</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-b from-light-blue to-light-green dark:from-ocean-blue dark:to-ocean-green p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-bold mb-4 flex items-center text-ocean-blue dark:text-white">
+                    <i class="fas fa-calendar-alt mr-2 text-primary-purple"></i> Learning Goals
+                </h3>
+
+                <div class="mb-4">
+                    <label for="goal-input" class="block mb-2 text-gray-700 dark:text-white">Add a new learning goal:</label>
+                    <div class="flex">
+                        <input type="text" id="goal-input" placeholder="Enter your learning goal" class="text-base flex-grow p-2 rounded-l-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-purple">
+                        <button id="add-goal-btn" class="bg-primary-purple hover:bg-primary-purple-dark text-white px-4 py-2 rounded-r-lg transition-colors">Add</button>
+                    </div>
+                </div>
+
+                <ul id="goals-list" class="space-y-2">
+                    <li class="flex items-center justify-between p-3 bg-white/50 dark:bg-gray-700/50 rounded-lg">
+                        <span class="text-gray-800 dark:text-white">Complete Python Basics Course</span>
+                        <div>
+                            <button class="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 mr-2">
+                                <i class="fas fa-check-circle"></i>
+                            </button>
+                            <button class="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                    <li class="flex items-center justify-between p-3 bg-white/50 dark:bg-gray-700/50 rounded-lg">
+                        <span class="text-gray-800 dark:text-white">Build a personal website</span>
+                        <div>
+                            <button class="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 mr-2">
+                                <i class="fas fa-check-circle"></i>
+                            </button>
+                            <button class="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quiz Section -->
+    <section id="quiz" class="section bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-80 rounded-lg p-6 shadow-lg mb-8 backdrop-blur-sm">
+        <h2 class="text-3xl font-bold mb-4 text-center text-ocean-blue dark:text-light-blue">Educational Quiz</h2>
+
+        <div id="quiz-intro" class="text-center py-6">
+            <p class="text-lg mb-6 text-gray-700 dark:text-gray-200">Test your knowledge with our educational quizzes on various topics.</p>
+
+            <div class="max-w-md mx-auto bg-gradient-to-b from-light-blue to-light-green dark:from-ocean-blue dark:to-ocean-green p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-bold mb-4 text-ocean-blue dark:text-white">Select Quiz Category</h3>
+                <select id="quiz-category" class="text-base w-full p-3 mb-4 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-purple">
+                    <option value="general">General Knowledge</option>
+                    <option value="programming">Programming Basics</option>
+                    <option value="science">Science Facts</option>
+                    <option value="history">World History</option>
+                </select>
+
+                <button id="start-quiz-btn" class="w-full px-6 py-3 bg-primary-purple hover:bg-primary-purple-dark text-white rounded-lg transition-colors shadow-md">Start Quiz</button>
+            </div>
+        </div>
+
+        <div id="quiz-container" class="max-w-2xl mx-auto hidden">
+            <div class="mb-4 flex justify-between items-center">
+                <div class="text-lg font-bold text-gray-800 dark:text-white" id="quiz-progress">Question 1 of 5</div>
+                <div class="bg-primary-purple px-3 py-1 rounded-lg text-white"><span id="quiz-timer">00:00</span></div>
+            </div>
+
+            <div class="bg-gradient-to-b from-light-blue to-light-green dark:from-ocean-blue dark:to-ocean-green p-6 rounded-lg mb-6 shadow-md">
+                <h3 id="quiz-question" class="text-xl font-bold mb-4 text-ocean-blue dark:text-white">Question goes here?</h3>
+
+                <div id="quiz-options" class="space-y-3">
+                    <!-- Options will be populated here -->
+                </div>
+            </div>
+
+            <div class="flex justify-between">
+                <button id="quiz-prev-btn" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors shadow-md">Previous</button>
+                <button id="quiz-next-btn" class="px-4 py-2 bg-primary-purple hover:bg-primary-purple-dark text-white rounded-lg transition-colors shadow-md">Next</button>
+            </div>
+        </div>
+
+        <div id="quiz-results" class="max-w-2xl mx-auto hidden">
+            <div class="bg-gradient-to-b from-light-blue to-light-green dark:from-ocean-blue dark:to-ocean-green p-6 rounded-lg text-center shadow-md">
+                <h3 class="text-2xl font-bold mb-3 text-ocean-blue dark:text-white">Quiz Results</h3>
+                <div class="text-5xl font-bold my-4 text-primary-purple dark:text-primary-400"><span id="quiz-score">0</span>%</div>
+                <p class="mb-4 text-gray-800 dark:text-white">You answered <span id="correct-answers">0</span> out of <span id="total-questions">0</span> questions correctly.</p>
+
+                <div id="quiz-feedback" class="mb-6 p-4 rounded-lg bg-white/50 dark:bg-gray-700/50 text-gray-800 dark:text-white">
+                    <!-- Feedback message will be added here -->
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button id="review-quiz-btn" class="px-4 py-2 bg-ocean-blue hover:bg-blue-700 text-white rounded-lg transition-colors shadow-md">Review Answers</button>
+                    <button id="restart-quiz-btn" class="px-4 py-2 bg-primary-purple hover:bg-primary-purple-dark text-white rounded-lg transition-colors shadow-md">Try Again</button>
+                    <button id="new-quiz-btn" class="px-4 py-2 bg-ocean-green hover:bg-green-700 text-white rounded-lg transition-colors shadow-md">New Quiz</button>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gradient-to-r from-ocean-blue to-ocean-green py-6 text-white text-center relative z-10 shadow-lg">
+    <div class="container mx-auto px-4">
+        <p class="mb-3">&copy; 2025 DigiReach. Empowering education for all.</p>
+        <div class="flex flex-wrap justify-center gap-x-4 gap-y-2 mb-4">
+            <a href="#" class="hover:text-primary-400 transition-colors nav-link" data-section="home">Home</a>
+            <a href="#" class="hover:text-primary-400 transition-colors nav-link" data-section="about">About</a>
+            <a href="#" class="hover:text-primary-400 transition-colors nav-link" data-section="resources">Resources</a>
+            <a href="#" class="hover:text-primary-400 transition-colors nav-link" data-section="dashboard">Dashboard</a>
+            <a href="#" class="hover:text-primary-400 transition-colors nav-link" data-section="quiz">Quiz</a>
+            <a href="#" class="hover:text-primary-400 transition-colors contact-link">Contact</a>
+        </div>
+        <div class="flex justify-center gap-4">
+            <a href="#" class="text-2xl hover:text-primary-400 transition-colors"><i class="fab fa-facebook"></i></a>
+            <a href="#" class="text-2xl hover:text-primary-400 transition-colors"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="text-2xl hover:text-primary-400 transition-colors"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="text-2xl hover:text-primary-400 transition-colors"><i class="fab fa-linkedin"></i></a>
+            <a href="#" class="text-2xl hover:text-primary-400 transition-colors"><i class="fab fa-youtube"></i></a>
+        </div>
+    </div>
+</footer>
+
+<!-- Modals -->
+<!-- Contact Modal -->
+<div id="contact-modal" class="modal hidden">
+    <div class="modal-content bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-ocean-blue dark:text-light-blue">Contact Us</h3>
+            <button class="modal-close text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="contact-form" class="space-y-4">
+            <div>
+                <label for="name" class="block mb-1 text-gray-700 dark:text-gray-300">Your Name</label>
+                <input type="text" id="name" placeholder="Enter your name" class="text-base w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-purple bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                <div class="error-message hidden text-red-500 text-sm mt-1"></div>
+            </div>
+            <div>
+                <label for="email" class="block mb-1 text-gray-700 dark:text-gray-300">Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email" class="text-base w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-purple bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                <div class="error-message hidden text-red-500 text-sm mt-1"></div>
+            </div>
+            <div>
+                <label for="message" class="block mb-1 text-gray-700 dark:text-gray-300">Message</label>
+                <textarea id="message" rows="4" placeholder="Type your message here" class="text-base w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-purple bg-white dark:bg-gray-700 text-gray-800 dark:text-white"></textarea>
+                <div class="error-message hidden text-red-500 text-sm mt-1"></div>
+            </div>
+            <button type="submit" class="w-full py-2 bg-primary-purple hover:bg-primary-purple-dark text-white rounded-lg transition-colors shadow-md">Send Message</button>
+        </form>
+    </div>
+</div>
+
+<!-- Login Modal -->
+<div id="login-modal" class="modal hidden">
+    <div class="modal-content bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-ocean-blue dark:text-light-blue">Login</h3>
+            <button class="modal-close text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="login-form" class="space-y-4">
+            <div>
+                <label for="login-email" class="block mb-1 text-gray-700 dark:text-gray-300">Email Address</label>
+                <input type="email" id="login-email" placeholder="Enter your email" class="text-base w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-purple bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                <div class="error-message hidden text-red-500 text-sm mt-1"></div>
+            </div>
+            <div>
+                <label for="login-password" class="block mb-1 text-gray-700 dark:text-gray-300">Password</label>
+                <input type="password" id="login-password" placeholder="Enter your password" class="text-base w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-purple bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                <div class="error-message hidden text-red-500 text-sm mt-1"></div>
+            </div>
+            <button type="submit" class="w-full py-2 bg-primary-purple hover:bg-primary-purple-dark text-white rounded-lg transition-colors shadow-md">Login</button>
+            <p class="text-center text-sm text-gray-700 dark:text-gray-300">
+                Don't have an account? <a href="#" id="register-link" class="text-primary-purple hover:text-primary-purple-dark">Register</a>
+            </p>
+        </form>
+    </div>
+</div>
+
+<!-- Register Modal -->
+<div id="register-modal" class="modal hidden">
+    <div class="modal-content bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-ocean-blue dark:text-light-blue">Create Account</h3>
+            <button class="modal-close text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="register-form" class="space-y-4">
+            <div>
+                <label for="register-name" class="block mb-1 text-gray-700 dark:text-gray-300">Full Name</label>
+                <input type="text" id="register-name" placeholder="Enter your full name" class="text-base w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-purple bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                <div class="error-message hidden text-red-500 text-sm mt-1"></div>
+            </div>
+            <div>
+                <label for="register-email" class="block mb-1 text-gray-700 dark:text-gray-300">Email Address</label>
+                <input type="email" id="register-email" placeholder="Enter your email" class="text-base w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-purple bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                <div class="error-message hidden text-red-500 text-sm mt-1"></div>
+            </div>
+            <div>
+                <label for="register-password" class="block mb-1 text-gray-700 dark:text-gray-300">Password</label>
+                <input type="password" id="register-password" placeholder="Create a password" class="text-base w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-purple bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                <div class="error-message hidden text-red-500 text-sm mt-1"></div>
+            </div>
+            <div>
+                <label for="register-confirm" class="block mb-1 text-gray-700 dark:text-gray-300">Confirm Password</label>
+                <input type="password" id="register-confirm" placeholder="Confirm your password" class="text-base w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-purple bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                <div class="error-message hidden text-red-500 text-sm mt-1"></div>
+            </div>
+            <button type="submit" class="w-full py-2 bg-primary-purple hover:bg-primary-purple-dark text-white rounded-lg transition-colors shadow-md">Create Account</button>
+            <p class="text-center text-sm text-gray-700 dark:text-gray-300">
+                Already have an account? <a href="#" id="login-link" class="text-primary-purple hover:text-primary-purple-dark">Login</a>
+            </p>
+        </form>
+    </div>
+</div>
+
+<!-- Submit Resource Modal -->
+<div id="submit-resource-modal" class="modal hidden">
+    <div class="modal-content bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-ocean-blue dark:text-light-blue">Submit a Resource</h3>
+            <button class="modal-close text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="resource-form" class="space-y-4">
+            <div>
+                <label for="resource-title" class="block mb-1 text-gray-700 dark:text-gray-300">Resource Title</label>
+                <input type="text" id="resource-title" placeholder="Enter resource title" class="text-base w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-purple bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                <div class="error-message hidden text-red-500 text-sm mt-1"></div>
+            </div>
+            <div>
+                <label for="resource-category" class="block mb-1 text-gray-700 dark:text-gray-300">Category</label>
+                <select id="resource-category" class="text-base w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-purple bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                    <option value="">Select a category</option>
+                    <option value="programming">Programming</option>
+                    <option value="study-skills">Study Skills</option>
+                    <option value="soft-skills">Soft Skills</option>
+                    <option value="science">Science</option>
+                </select>
+                <div class="error-message hidden text-red-500 text-sm mt-1"></div>
+            </div>
+            <div>
+                <label for="resource-description" class="block mb-1 text-gray-700 dark:text-gray-300">Description</label>
+                <textarea id="resource-description" rows="3" placeholder="Describe the resource" class="text-base w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-purple bg-white dark:bg-gray-700 text-gray-800 dark:text-white"></textarea>
+                <div class="error-message hidden text-red-500 text-sm mt-1"></div>
+            </div>
+            <div>
+                <label for="resource-url" class="block mb-1 text-gray-700 dark:text-gray-300">Resource URL</label>
+                <input type="url" id="resource-url" placeholder="https://example.com" class="text-base w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-purple bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                <div class="error-message hidden text-red-500 text-sm mt-1"></div>
+            </div>
+            <div>
+                <label for="resource-video" class="block mb-1 text-gray-700 dark:text-gray-300">Video URL (Optional)</label>
+                <input type="url" id="resource-video" placeholder="https://youtube.com/watch?v=example" class="text-base w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-purple bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+            </div>
+            <button type="submit" class="w-full py-2 bg-primary-purple hover:bg-primary-purple-dark text-white rounded-lg transition-colors shadow-md">Submit Resource</button>
+        </form>
+    </div>
+</div>
+
+<!-- Success Notification -->
+<div id="success-notification" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+    <div class="flex items-center">
+        <i class="fas fa-check-circle mr-2"></i>
+        <span id="success-message">Operation completed successfully!</span>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script>
+    // App State Management (simulating storage without localStorage)
+    const AppState = {
+        isLoggedIn: false,
+        user: null,
+        savedResources: [],
+        activeQuiz: null,
+        quizAnswers: [],
+        currentQuestionIndex: 0,
+        quizTimer: null,
+        quizSeconds: 0,
+        quizMode: 'quiz' // quiz, review
+    };
+
+    // Resource Data
+    const resources = [
+        {
+            id: 1,
+            title: "Python Programming Guide",
+            description: "Learn the basics of Python programming with this comprehensive guide.",
+            category: "programming",
+            imageUrl: "https://images.pexels.com/photos/1181676/pexels-photo-1181676.jpeg",
+            resourceUrl: "https://www.learnpython.org/",
+            videoUrl: "https://www.youtube.com/watch?v=rfscVS0vtbw"
+        },
+        {
+            id: 2,
+            title: "Effective Online Learning Tips",
+            description: "Master the art of learning online with these practical tips and strategies.",
+            category: "study-skills",
+            imageUrl: "https://images.pexels.com/photos/3184295/pexels-photo-3184295.jpeg",
+            resourceUrl: "https://www.edutopia.org/article/7-tips-online-learning",
+            videoUrl: "https://www.youtube.com/watch?v=st5T2E1l5_Q"
+        },
+        {
+            id: 3,
+            title: "Teamwork and Collaboration",
+            description: "Enhance your teamwork abilities and become a more effective collaborator.",
+            category: "soft-skills",
+            imageUrl: "https://images.pexels.com/photos/3184296/pexels-photo-3184296.jpeg",
+            resourceUrl: "https://www.mindtools.com/pages/article/newTMM_75.htm",
+            videoUrl: "https://www.youtube.com/watch?v=H2g1YxH9S08"
+        },
+        {
+            id: 4,
+            title: "Web Development for Beginners",
+            description: "Start your journey in web development with this beginner-friendly guide.",
+            category: "programming",
+            imageUrl: "https://images.pexels.com/photos/3184297/pexels-photo-3184297.jpeg",
+            resourceUrl: "https://www.codecademy.com/",
+            videoUrl: "https://www.youtube.com/watch?v=ZjaZ8t7f2d8"
+        },
+        {
+            id: 5,
+            title: "Geography Fundamentals",
+            description: "Understanding the basics of geography and how it shapes our world.",
+            category: "science",
+            imageUrl: "https://images.pexels.com/photos/3184298/pexels-photo-3184298.jpeg",
+            resourceUrl: "https://www.nationalgeographic.org/education/national-geographic-beginners-guide-geography/",
+            videoUrl: "https://www.youtube.com/watch?v=8xYt9Jk9i90"
+        },
+        {
+            id: 6,
+            title: "Introduction to Biology",
+            description: "Explore the fascinating world of biology with this introductory course.",
+            category: "science",
+            imageUrl: "https://images.pexels.com/photos/3184299/pexels-photo-3184299.jpeg",
+            resourceUrl: "https://www.khanacademy.org/science/biology",
+            videoUrl: "https://www.youtube.com/watch?v=1Z8lT3I0w1g"
+        }
+    ];
+
+    // Quiz Data
+    const quizzes = {
+        general: {
+            title: "General Knowledge Quiz",
+            questions: [
+                {
+                    question: "Which planet is known as the Red Planet?",
+                    options: ["Venus", "Mars", "Jupiter", "Saturn"],
+                    answer: 1
+                },
+                {
+                    question: "What is the largest ocean on Earth?",
+                    options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+                    answer: 3
+                },
+                {
+                    question: "Who wrote the play 'Romeo and Juliet'?",
+                    options: ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"],
+                    answer: 1
+                },
+                {
+                    question: "What is the tallest mountain in the world?",
+                    options: ["K2", "Kilimanjaro", "Mount Everest", "Mount Fuji"],
+                    answer: 2
+                },
+                {
+                    question: "Which element has the chemical symbol 'O'?",
+                    options: ["Osmium", "Oxygen", "Gold", "Oganesson"],
+                    answer: 1
+                }
+            ]
+        },
+        programming: {
+            title: "Programming Basics Quiz",
+            questions: [
+                {
+                    question: "Which programming language is known for its use in web development?",
+                    options: ["Python", "C++", "JavaScript", "Swift"],
+                    answer: 2
+                },
+                {
+                    question: "What does HTML stand for?",
+                    options: ["Hyper Text Markup Language", "High Technical Modern Language", "Hyper Transfer Mode Language", "Hybrid Text Multiple Language"],
+                    answer: 0
+                },
+                {
+                    question: "Which symbol is used for comments in Python?",
+                    options: ["//", "/* */", "#", "<!-- -->"],
+                    answer: 2
+                },
+                {
+                    question: "What is the correct syntax for a for loop in JavaScript?",
+                    options: ["for (i = 0; i < 5; i++)", "for (i < 5; i++)", "for (i = 0; i++; i < 5)", "for i = 1 to 5"],
+                    answer: 0
+                },
+                {
+                    question: "Which of these is not a programming paradigm?",
+                    options: ["Object-Oriented", "Functional", "Declarative", "Accelerative"],
+                    answer: 3
+                }
+            ]
+        },
+        science: {
+            title: "Science Facts Quiz",
+            questions: [
+                {
+                    question: "What is the chemical symbol for gold?",
+                    options: ["Go", "Gl", "Gd", "Au"],
+                    answer: 3
+                },
+                {
+                    question: "Which of these is not a state of matter?",
+                    options: ["Solid", "Liquid", "Gas", "Crystal"],
+                    answer: 3
+                },
+                {
+                    question: "What is the hardest natural substance on Earth?",
+                    options: ["Diamond", "Titanium", "Tungsten", "Steel"],
+                    answer: 0
+                },
+                {
+                    question: "How many bones are in the adult human body?",
+                    options: ["206", "186", "216", "226"],
+                    answer: 0
+                },
+                {
+                    question: "Which planet has the most moons?",
+                    options: ["Jupiter", "Saturn", "Uranus", "Neptune"],
+                    answer: 1
+                }
+            ]
+        },
+        history: {
+            title: "World History Quiz",
+            questions: [
+                {
+                    question: "In which year did World War II end?",
+                    options: ["1943", "1945", "1947", "1950"],
+                    answer: 1
+                },
+                {
+                    question: "Who was the first Emperor of Rome?",
+                    options: ["Julius Caesar", "Augustus", "Nero", "Caligula"],
+                    answer: 1
+                },
+                {
+                    question: "Which ancient civilization built the Machu Picchu?",
+                    options: ["Aztecs", "Mayans", "Incas", "Olmecs"],
+                    answer: 2
+                },
+                {
+                    question: "The Renaissance period began in which country?",
+                    options: ["France", "England", "Spain", "Italy"],
+                    answer: 3
+                },
+                {
+                    question: "Who wrote 'The Communist Manifesto'?",
+                    options: ["Vladimir Lenin", "Joseph Stalin", "Karl Marx and Friedrich Engels", "Mao Zedong"],
+                    answer: 2
+                }
+            ]
+        }
+    };
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check for dark mode preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+            document.body.classList.add('dark');
+        }
+
+        // Initialize particles.js
+        if (typeof particlesJS !== 'undefined') {
+            particlesJS('particles-js', {
+                particles: {
+                    number: { value: 50, density: { enable: true, value_area: 800 } },
+                    color: { value: "#ffffff" },
+                    shape: { type: "circle" },
+                    opacity: { value: 0.1, random: true },
+                    size: { value: 3, random: true },
+                    line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.1, width: 1 },
+                    move: { enable: true, speed: 2, direction: "none", random: true, straight: false, out_mode: "out", bounce: false }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
+                    modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
+                },
+                retina_detect: true
+            });
+        }
+
+        // Initialize theme toggle
+        initThemeToggle();
+
+        // Initialize navigation
+        initNavigation();
+
+        // Initialize modals
+        initModals();
+
+        // Initialize forms
+        initForms();
+
+        // Load resources
+        loadResources();
+
+        // Initialize quiz functionality
+        initQuiz();
+
+        // Update UI based on login state
+        updateUIBasedOnLoginState();
+    });
+
+    function initThemeToggle() {
+        const themeToggle = document.getElementById('theme-toggle');
+
+        themeToggle.addEventListener('click', function() {
+            document.documentElement.classList.toggle('dark');
+            document.body.classList.toggle('dark');
+        });
+
+        // Listen for system preference changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+                document.body.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.body.classList.remove('dark');
+            }
+        });
+    }
+
+    function initNavigation() {
+        // Handle navigation buttons
+        document.querySelectorAll('.nav-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const sectionId = this.getAttribute('data-section');
+                showSection(sectionId);
+            });
+        });
+
+        // Handle navigation links in footer
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const sectionId = this.getAttribute('data-section');
+                showSection(sectionId);
+            });
+        });
+
+        // Show home section by default (already active in HTML)
+    }
+
+    function showSection(sectionId) {
+        // Hide all sections
+        document.querySelectorAll('.section').forEach(section => {
+            section.classList.remove('active-section');
+        });
+
+        // Show the selected section
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.classList.add('active-section');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // If it's the resources section, ensure resources are loaded
+            if (sectionId === 'resources') {
+                loadResources();
+            }
+
+            // If it's the dashboard, update based on login state
+            if (sectionId === 'dashboard') {
+                updateDashboard();
+            }
+        }
+    }
+
+    function initModals() {
+        // Contact modal
+        document.querySelectorAll('.contact-btn, .contact-link').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.getElementById('contact-modal').style.display = 'flex';
+            });
+        });
+
+        // Login button
+        document.getElementById('login-btn').addEventListener('click', function() {
+            document.getElementById('login-modal').style.display = 'flex';
+        });
+
+        // Dashboard login button
+        document.getElementById('dashboard-login-btn').addEventListener('click', function() {
+            document.getElementById('login-modal').style.display = 'flex';
+        });
+
+        // Register link
+        document.getElementById('register-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('login-modal').style.display = 'none';
+            document.getElementById('register-modal').style.display = 'flex';
+        });
+
+        // Login link
+        document.getElementById('login-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('register-modal').style.display = 'none';
+            document.getElementById('login-modal').style.display = 'flex';
+        });
+
+        // Submit resource button
+        document.getElementById('submit-resource-btn').addEventListener('click', function() {
+            if (AppState.isLoggedIn) {
+                document.getElementById('submit-resource-modal').style.display = 'flex';
+            } else {
+                showSuccessNotification('Please log in to submit resources', false);
+                document.getElementById('login-modal').style.display = 'flex';
+            }
+        });
+
+        // Logout button
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            AppState.isLoggedIn = false;
+            AppState.user = null;
+            updateUIBasedOnLoginState();
+            showSuccessNotification('Successfully logged out');
+        });
+
+        // Close buttons for all modals
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const modal = this.closest('.modal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    function initForms() {
+        // Contact form submission
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Validate form
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const messageInput = document.getElementById('message');
+
+            let isValid = true;
+
+            // Validate name
+            if (!nameInput.value.trim()) {
+                showInputError(nameInput, 'Please enter your name');
+                isValid = false;
+            } else {
+                hideInputError(nameInput);
+            }
+
+            // Validate email
+            if (!validateEmail(emailInput.value)) {
+                showInputError(emailInput, 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                hideInputError(emailInput);
+            }
+
+            // Validate message
+            if (!messageInput.value.trim()) {
+                showInputError(messageInput, 'Please enter your message');
+                isValid = false;
+            } else {
+                hideInputError(messageInput);
+            }
+
+            if (isValid) {
+                // In a real app, we would send the form data to the server
+                // For now, just show a success message and close the modal
+                document.getElementById('contact-modal').style.display = 'none';
+                showSuccessNotification('Your message has been sent successfully');
+
+                // Reset form
+                this.reset();
+            }
+        });
+
+        // Login form submission
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Validate form
+            const emailInput = document.getElementById('login-email');
+            const passwordInput = document.getElementById('login-password');
+
+            let isValid = true;
+
+            // Validate email
+            if (!validateEmail(emailInput.value)) {
+                showInputError(emailInput, 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                hideInputError(emailInput);
+            }
+
+            // Validate password
+            if (!passwordInput.value.trim()) {
+                showInputError(passwordInput, 'Please enter your password');
+                isValid = false;
+            } else {
+                hideInputError(passwordInput);
+            }
+
+            if (isValid) {
+                // Simulate login (in a real app, this would verify credentials with a server)
+                AppState.isLoggedIn = true;
+                AppState.user = {
+                    name: emailInput.value.split('@')[0],
+                    email: emailInput.value
+                };
+
+                // Update UI
+                updateUIBasedOnLoginState();
+
+                // Close modal
+                document.getElementById('login-modal').style.display = 'none';
+
+                // Show success notification
+                showSuccessNotification('Successfully logged in');
+
+                // Reset form
+                this.reset();
+            }
+        });
+
+        // Register form submission
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Validate form
+            const nameInput = document.getElementById('register-name');
+            const emailInput = document.getElementById('register-email');
+            const passwordInput = document.getElementById('register-password');
+            const confirmInput = document.getElementById('register-confirm');
+
+            let isValid = true;
+
+            // Validate name
+            if (!nameInput.value.trim()) {
+                showInputError(nameInput, 'Please enter your name');
+                isValid = false;
+            } else {
+                hideInputError(nameInput);
+            }
+
+            // Validate email
+            if (!validateEmail(emailInput.value)) {
+                showInputError(emailInput, 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                hideInputError(emailInput);
+            }
+
+            // Validate password
+            if (passwordInput.value.length < 6) {
+                showInputError(passwordInput, 'Password must be at least 6 characters');
+                isValid = false;
+            } else {
+                hideInputError(passwordInput);
+            }
+
+            // Validate confirm password
+            if (confirmInput.value !== passwordInput.value) {
+                showInputError(confirmInput, 'Passwords do not match');
+                isValid = false;
+            } else {
+                hideInputError(confirmInput);
+            }
+
+            if (isValid) {
+                // Simulate registration (in a real app, this would create an account on the server)
+                AppState.isLoggedIn = true;
+                AppState.user = {
+                    name: nameInput.value,
+                    email: emailInput.value
+                };
+
+                // Update UI
+                updateUIBasedOnLoginState();
+
+                // Close modal
+                document.getElementById('register-modal').style.display = 'none';
+
+                // Show success notification
+                showSuccessNotification('Account created successfully');
+
+                // Reset form
+                this.reset();
+            }
+        });
+
+        // Resource submission form
+        document.getElementById('resource-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Validate form
+            const titleInput = document.getElementById('resource-title');
+            const categoryInput = document.getElementById('resource-category');
+            const descriptionInput = document.getElementById('resource-description');
+            const urlInput = document.getElementById('resource-url');
+
+            let isValid = true;
+
+            // Validate title
+            if (!titleInput.value.trim()) {
+                showInputError(titleInput, 'Please enter a title');
+                isValid = false;
+            } else {
+                hideInputError(titleInput);
+            }
+
+            // Validate category
+            if (!categoryInput.value) {
+                showInputError(categoryInput, 'Please select a category');
+                isValid = false;
+            } else {
+                hideInputError(categoryInput);
+            }
+
+            // Validate description
+            if (!descriptionInput.value.trim()) {
+                showInputError(descriptionInput, 'Please enter a description');
+                isValid = false;
+            } else {
+                hideInputError(descriptionInput);
+            }
+
+            // Validate URL
+            if (!urlInput.value.trim() || !validateUrl(urlInput.value)) {
+                showInputError(urlInput, 'Please enter a valid URL');
+                isValid = false;
+            } else {
+                hideInputError(urlInput);
+            }
+
+            if (isValid) {
+                // In a real app, we would send the resource data to the server
+                // For now, just show a success message and close the modal
+                document.getElementById('submit-resource-modal').style.display = 'none';
+                showSuccessNotification('Resource submitted successfully! After review, it will be added to our collection.');
+
+                // Reset form
+                this.reset();
+            }
+        });
+
+        // Add goal form
+        document.getElementById('add-goal-btn').addEventListener('click', function() {
+            const goalInput = document.getElementById('goal-input');
+            const goalText = goalInput.value.trim();
+
+            if (goalText) {
+                const goalsList = document.getElementById('goals-list');
+
+                const li = document.createElement('li');
+                li.className = 'flex items-center justify-between p-3 bg-white/50 dark:bg-gray-700/50 rounded-lg';
+                li.innerHTML = `
+                        <span class="text-gray-800 dark:text-white">${goalText}</span>
+                        <div>
+                            <button class="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 mr-2 complete-goal">
+                                <i class="fas fa-check-circle"></i>
+                            </button>
+                            <button class="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 delete-goal">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+
+                goalsList.appendChild(li);
+                goalInput.value = '';
+
+                // Add event listeners
+                li.querySelector('.complete-goal').addEventListener('click', function() {
+                    li.querySelector('span').classList.toggle('line-through');
+                });
+
+                li.querySelector('.delete-goal').addEventListener('click', function() {
+                    li.remove();
+                });
+            }
+        });
+    }
+
+    function showInputError(input, message) {
+        const errorElement = input.nextElementSibling;
+        errorElement.textContent = message;
+        errorElement.classList.remove('hidden');
+        input.classList.add('border-red-500');
+    }
+
+    function hideInputError(input) {
+        const errorElement = input.nextElementSibling;
+        errorElement.classList.add('hidden');
+        input.classList.remove('border-red-500');
+    }
+
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    function validateUrl(url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (err) {
+            return false;
+        }
+    }
+
+    function showSuccessNotification(message, isSuccess = true) {
+        const notification = document.getElementById('success-notification');
+        const messageElement = document.getElementById('success-message');
+
+        messageElement.textContent = message;
+
+        if (!isSuccess) {
+            notification.classList.remove('bg-green-500');
+            notification.classList.add('bg-red-500');
+        } else {
+            notification.classList.remove('bg-red-500');
+            notification.classList.add('bg-green-500');
+        }
+
+        // Show notification
+        notification.classList.add('show');
+        notification.style.transform = 'translateY(0)';
+        notification.style.opacity = '1';
+
+        // Hide after 3 seconds
+        setTimeout(() => {
+            notification.style.transform = 'translateY(20px)';
+            notification.style.opacity = '0';
+            notification.classList.remove('show');
+        }, 3000);
+    }
+
+    function updateUIBasedOnLoginState() {
+        const loginBtn = document.getElementById('login-btn');
+        const userProfile = document.getElementById('user-profile');
+        const usernameDisplay = document.getElementById('username-display');
+        const loginRequiredMessage = document.getElementById('login-required-message');
+        const dashboardContent = document.getElementById('dashboard-content');
+
+        if (AppState.isLoggedIn) {
+            loginBtn.classList.add('hidden');
+            userProfile.classList.remove('hidden');
+            userProfile.classList.add('flex');
+            usernameDisplay.textContent = `Welcome, ${AppState.user.name}`;
+
+            if (loginRequiredMessage && dashboardContent) {
+                loginRequiredMessage.classList.add('hidden');
+                dashboardContent.classList.remove('hidden');
+            }
+        } else {
+            loginBtn.classList.remove('hidden');
+            userProfile.classList.add('hidden');
+            userProfile.classList.remove('flex');
+
+            if (loginRequiredMessage && dashboardContent) {
+                loginRequiredMessage.classList.remove('hidden');
+                dashboardContent.classList.add('hidden');
+            }
+        }
+
+        updateDashboard();
+    }
+
+    function updateDashboard() {
+        if (!AppState.isLoggedIn) return;
+
+        const savedResourcesContainer = document.getElementById('saved-resources');
+        if (!savedResourcesContainer) return;
+
+        // Clear existing content
+        savedResourcesContainer.innerHTML = '';
+
+        // Show saved resources or empty state
+        if (AppState.savedResources.length === 0) {
+            savedResourcesContainer.innerHTML = '<p class="text-gray-700 dark:text-gray-300 italic text-center">No resources saved yet.</p>';
+        } else {
+            AppState.savedResources.forEach(resourceId => {
+                const resource = resources.find(r => r.id === resourceId);
+                if (resource) {
+                    const resourceElement = document.createElement('div');
+                    resourceElement.className = 'p-2 bg-white/50 dark:bg-gray-700/50 rounded flex justify-between items-center';
+                    resourceElement.innerHTML = `
+                            <span class="truncate text-gray-800 dark:text-white">${resource.title}</span>
+                            <button class="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 remove-saved" data-id="${resource.id}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                    savedResourcesContainer.appendChild(resourceElement);
+                }
+            });
+
+            // Add event listeners for remove buttons
+            document.querySelectorAll('.remove-saved').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const resourceId = parseInt(this.getAttribute('data-id'));
+                    AppState.savedResources = AppState.savedResources.filter(id => id !== resourceId);
+                    updateDashboard();
+                    updateResourceCards();
+                });
+            });
+        }
+    }
+
+    function loadResources() {
+        const resourceGrid = document.getElementById('resource-grid');
+        const resourceLoading = document.getElementById('resource-loading');
+        const noResources = document.getElementById('no-resources');
+
+        if (!resourceGrid || !resourceLoading || !noResources) return;
+
+        // Show loading indicator
+        resourceGrid.innerHTML = '';
+        resourceLoading.classList.remove('hidden');
+        noResources.classList.add('hidden');
+
+        // Simulate loading delay
+        setTimeout(() => {
+            resourceLoading.classList.add('hidden');
+
+            const searchInput = document.getElementById('resource-search');
+            const categoryFilter = document.getElementById('category-filter');
+
+            let filteredResources = [...resources];
+
+            // Apply search filter if there's a search term
+            if (searchInput && searchInput.value.trim()) {
+                const searchTerm = searchInput.value.trim().toLowerCase();
+                filteredResources = filteredResources.filter(resource =>
+                    resource.title.toLowerCase().includes(searchTerm) ||
+                    resource.description.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Apply category filter if it's not "all"
+            if (categoryFilter && categoryFilter.value !== 'all') {
+                filteredResources = filteredResources.filter(resource =>
+                    resource.category === categoryFilter.value
+                );
+            }
+
+            // Show "no resources" message if no resources match filters
+            if (filteredResources.length === 0) {
+                noResources.classList.remove('hidden');
+                return;
+            }
+
+            // Render resources
+            filteredResources.forEach(resource => {
+                const isSaved = AppState.savedResources.includes(resource.id);
+
+                const card = document.createElement('div');
+                card.className = 'resource-card bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-ocean-blue dark:border-gray-600';
+                card.innerHTML = `
+                        <img src="${resource.imageUrl}" alt="${resource.title}" class="w-full h-40 md:h-48 object-cover">
+                        <div class="p-3 md:p-4">
+                            <h4 class="text-lg md:text-xl font-semibold mb-2 text-ocean-blue dark:text-light-blue">${resource.title}</h4>
+                            <p class="text-sm md:text-base mb-3 md:mb-4 text-gray-700 dark:text-gray-300">${resource.description}</p>
+                            <div class="flex flex-wrap gap-1 md:gap-2">
+                                <a href="${resource.resourceUrl}" target="_blank" class="bg-ocean-green hover:bg-green-700 text-white px-3 py-1 md:px-4 md:py-2 rounded text-xs md:text-sm transition-colors shadow-sm">
+                                    View Resource
+                                </a>
+                                ${resource.videoUrl ? `
+                                <a href="${resource.videoUrl}" target="_blank" class="bg-ocean-blue hover:bg-blue-700 text-white px-3 py-1 md:px-4 md:py-2 rounded text-xs md:text-sm transition-colors shadow-sm">
+                                    Watch Video
+                                </a>
+                                ` : ''}
+                                <button class="save-resource-btn ${isSaved ? 'bg-gray-400 hover:bg-gray-500' : 'bg-primary-purple hover:bg-primary-purple-dark'} text-white px-3 py-1 md:px-4 md:py-2 rounded text-xs md:text-sm transition-colors shadow-sm" data-id="${resource.id}">
+                                    ${isSaved ? '<i class="fas fa-check mr-1"></i> Saved' : '<i class="fas fa-bookmark mr-1"></i> Save'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+
+                resourceGrid.appendChild(card);
+            });
+
+            // Add event listeners to save buttons
+            document.querySelectorAll('.save-resource-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (!AppState.isLoggedIn) {
+                        showSuccessNotification('Please log in to save resources', false);
+                        document.getElementById('login-modal').style.display = 'flex';
+                        return;
+                    }
+
+                    const resourceId = parseInt(this.getAttribute('data-id'));
+                    const isSaved = AppState.savedResources.includes(resourceId);
+
+                    if (isSaved) {
+                        // Remove from saved resources
+                        AppState.savedResources = AppState.savedResources.filter(id => id !== resourceId);
+                        this.innerHTML = '<i class="fas fa-bookmark mr-1"></i> Save';
+                        this.classList.remove('bg-gray-400', 'hover:bg-gray-500');
+                        this.classList.add('bg-primary-purple', 'hover:bg-primary-purple-dark');
+                        showSuccessNotification('Resource removed from saved items');
+                    } else {
+                        // Add to saved resources
+                        AppState.savedResources.push(resourceId);
+                        this.innerHTML = '<i class="fas fa-check mr-1"></i> Saved';
+                        this.classList.remove('bg-primary-purple', 'hover:bg-primary-purple-dark');
+                        this.classList.add('bg-gray-400', 'hover:bg-gray-500');
+                        showSuccessNotification('Resource saved successfully');
+                    }
+
+                    updateDashboard();
+                });
+            });
+
+            // Add event listener to clear filters button
+            document.getElementById('clear-filters').addEventListener('click', function() {
+                if (searchInput) searchInput.value = '';
+                if (categoryFilter) categoryFilter.value = 'all';
+                loadResources();
+            });
+
+        }, 500); // Simulated loading delay
+    }
+
+    function updateResourceCards() {
+        document.querySelectorAll('.save-resource-btn').forEach(btn => {
+            const resourceId = parseInt(btn.getAttribute('data-id'));
+            const isSaved = AppState.savedResources.includes(resourceId);
+
+            if (isSaved) {
+                btn.innerHTML = '<i class="fas fa-check mr-1"></i> Saved';
+                btn.classList.remove('bg-primary-purple', 'hover:bg-primary-purple-dark');
+                btn.classList.add('bg-gray-400', 'hover:bg-gray-500');
+            } else {
+                btn.innerHTML = '<i class="fas fa-bookmark mr-1"></i> Save';
+                btn.classList.remove('bg-gray-400', 'hover:bg-gray-500');
+                btn.classList.add('bg-primary-purple', 'hover:bg-primary-purple-dark');
+            }
+        });
+    }
+
+    // Quiz functionality
+    function initQuiz() {
+        // Start quiz button
+        document.getElementById('start-quiz-btn').addEventListener('click', function() {
+            const category = document.getElementById('quiz-category').value;
+            startQuiz(category);
+        });
+
+        // Quiz navigation buttons
+        document.getElementById('quiz-prev-btn').addEventListener('click', function() {
+            if (AppState.currentQuestionIndex > 0) {
+                AppState.currentQuestionIndex--;
+                displayQuizQuestion();
+            }
+        });
+
+        document.getElementById('quiz-next-btn').addEventListener('click', function() {
+            const quiz = AppState.activeQuiz;
+            if (!quiz) return;
+
+            // Check if this is the last question
+            if (AppState.currentQuestionIndex === quiz.questions.length - 1) {
+                // If we're in review mode, go back to results
+                if (AppState.quizMode === 'review') {
+                    showQuizResults();
+                    return;
+                }
+
+                // If user has not answered all questions, confirm submission
+                const unanswered = AppState.quizAnswers.includes(undefined);
+                if (unanswered) {
+                    const confirm = window.confirm('You have not answered all questions. Submit anyway?');
+                    if (!confirm) return;
+                }
+
+                // End the quiz
+                endQuiz();
+            } else {
+                // Move to next question
+                AppState.currentQuestionIndex++;
+                displayQuizQuestion();
+            }
+        });
+
+        // Quiz result buttons
+        document.getElementById('review-quiz-btn').addEventListener('click', function() {
+            AppState.quizMode = 'review';
+            AppState.currentQuestionIndex = 0;
+            displayQuizQuestion();
+
+            document.getElementById('quiz-results').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+
+            // Change Next button text on last question when in review mode
+            updateQuizNextButton();
+        });
+
+        document.getElementById('restart-quiz-btn').addEventListener('click', function() {
+            startQuiz(AppState.activeQuiz.category);
+        });
+
+        document.getElementById('new-quiz-btn').addEventListener('click', function() {
+            resetQuiz();
+            document.getElementById('quiz-results').classList.add('hidden');
+            document.getElementById('quiz-intro').classList.remove('hidden');
+        });
+
+        // Set up search and category filter event listeners
+        const resourceSearch = document.getElementById('resource-search');
+        const categoryFilter = document.getElementById('category-filter');
+
+        if (resourceSearch) {
+            resourceSearch.addEventListener('input', debounce(function() {
+                loadResources();
+            }, 300));
+        }
+
+        if (categoryFilter) {
+            categoryFilter.addEventListener('change', function() {
+                loadResources();
+            });
+        }
+    }
+
+    function startQuiz(category) {
+        // Get the quiz data
+        const quiz = quizzes[category];
+        if (!quiz) return;
+
+        // Set up quiz state
+        AppState.activeQuiz = {
+            ...quiz,
+            category: category,
+            startTime: new Date(),
+        };
+        AppState.quizAnswers = new Array(quiz.questions.length).fill(undefined);
+        AppState.currentQuestionIndex = 0;
+        AppState.quizMode = 'quiz';
+        AppState.quizSeconds = 0;
+
+        // Hide intro, show quiz container
+        document.getElementById('quiz-intro').classList.add('hidden');
+        document.getElementById('quiz-container').classList.remove('hidden');
+        document.getElementById('quiz-results').classList.add('hidden');
+
+        // Start timer
+        startQuizTimer();
+
+        // Display first question
+        displayQuizQuestion();
+    }
+
+    function displayQuizQuestion() {
+        const quiz = AppState.activeQuiz;
+        if (!quiz) return;
+
+        const questionIndex = AppState.currentQuestionIndex;
+        const question = quiz.questions[questionIndex];
+        const userAnswer = AppState.quizAnswers[questionIndex];
+
+        // Update progress indicator
+        document.getElementById('quiz-progress').textContent = `Question ${questionIndex + 1} of ${quiz.questions.length}`;
+
+        // Update question text
+        document.getElementById('quiz-question').textContent = question.question;
+
+        // Clear and rebuild options
+        const optionsContainer = document.getElementById('quiz-options');
+        optionsContainer.innerHTML = '';
+
+        // Add options
+        question.options.forEach((option, index) => {
+            const optionElement = document.createElement('div');
+            optionElement.className = `quiz-option p-3 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white ${userAnswer === index ? 'selected' : ''}`;
+
+            // In review mode, show correct/incorrect styles
+            if (AppState.quizMode === 'review') {
+                if (index === question.answer) {
+                    optionElement.classList.add('correct');
+                } else if (userAnswer === index) {
+                    optionElement.classList.add('incorrect');
+                }
+            }
+
+            optionElement.textContent = option;
+            optionElement.setAttribute('data-index', index);
+
+            optionsContainer.appendChild(optionElement);
+
+            // Add click handler (only in quiz mode, not review mode)
+            if (AppState.quizMode === 'quiz') {
+                optionElement.addEventListener('click', function() {
+                    selectQuizOption(index);
+                });
+            }
+        });
+
+        // Update button states
+        document.getElementById('quiz-prev-btn').disabled = questionIndex === 0;
+
+        // Update Next button text
+        updateQuizNextButton();
+    }
+
+    function updateQuizNextButton() {
+        const nextBtn = document.getElementById('quiz-next-btn');
+        const isLastQuestion = AppState.currentQuestionIndex === AppState.activeQuiz.questions.length - 1;
+
+        if (isLastQuestion) {
+            if (AppState.quizMode === 'review') {
+                nextBtn.textContent = 'Back to Results';
+            } else {
+                nextBtn.textContent = 'Finish Quiz';
+            }
+        } else {
+            nextBtn.textContent = 'Next';
+        }
+    }
+
+    function selectQuizOption(optionIndex) {
+        // Save the answer
+        AppState.quizAnswers[AppState.currentQuestionIndex] = optionIndex;
+
+        // Update UI
+        document.querySelectorAll('.quiz-option').forEach((option, index) => {
+            if (index === optionIndex) {
+                option.classList.add('selected');
+            } else {
+                option.classList.remove('selected');
+            }
+        });
+    }
+
+    function startQuizTimer() {
+        // Clear any existing timer
+        if (AppState.quizTimer) {
+            clearInterval(AppState.quizTimer);
+        }
+
+        // Reset timer
+        AppState.quizSeconds = 0;
+        updateQuizTimerDisplay();
+
+        // Start timer
+        AppState.quizTimer = setInterval(() => {
+            AppState.quizSeconds++;
+            updateQuizTimerDisplay();
+        }, 1000);
+    }
+
+    function updateQuizTimerDisplay() {
+        const timerElement = document.getElementById('quiz-timer');
+        const minutes = Math.floor(AppState.quizSeconds / 60);
+        const seconds = AppState.quizSeconds % 60;
+
+        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function endQuiz() {
+        // Stop timer
+        if (AppState.quizTimer) {
+            clearInterval(AppState.quizTimer);
+            AppState.quizTimer = null;
+        }
+
+        // Calculate score
+        const quiz = AppState.activeQuiz;
+        let correctAnswers = 0;
+
+        AppState.quizAnswers.forEach((answer, index) => {
+            if (answer === quiz.questions[index].answer) {
+                correctAnswers++;
+            }
+        });
+
+        const totalQuestions = quiz.questions.length;
+        const scorePercentage = Math.round((correctAnswers / totalQuestions) * 100);
+
+        // Show results
+        document.getElementById('quiz-container').classList.add('hidden');
+        document.getElementById('quiz-results').classList.remove('hidden');
+
+        document.getElementById('quiz-score').textContent = scorePercentage;
+        document.getElementById('correct-answers').textContent = correctAnswers;
+        document.getElementById('total-questions').textContent = totalQuestions;
+
+        // Provide feedback based on score
+        const feedbackElement = document.getElementById('quiz-feedback');
+        let feedbackClass = '';
+        let feedbackText = '';
+
+        if (scorePercentage >= 80) {
+            feedbackClass = 'bg-green-500/20 text-green-800 dark:text-green-200';
+            feedbackText = 'Excellent! You have a strong understanding of this topic.';
+        } else if (scorePercentage >= 60) {
+            feedbackClass = 'bg-blue-500/20 text-blue-800 dark:text-blue-200';
+            feedbackText = 'Good job! You have a decent grasp of the material.';
+        } else if (scorePercentage >= 40) {
+            feedbackClass = 'bg-yellow-500/20 text-yellow-800 dark:text-yellow-200';
+            feedbackText = 'You\'re making progress, but might want to review the material again.';
+        } else {
+            feedbackClass = 'bg-red-500/20 text-red-800 dark:text-red-200';
+            feedbackText = 'This topic seems challenging for you. Consider revisiting the learning materials.';
+        }
+
+        feedbackElement.className = `mb-6 p-4 rounded-lg ${feedbackClass}`;
+        feedbackElement.textContent = feedbackText;
+    }
+
+    function showQuizResults() {
+        document.getElementById('quiz-container').classList.add('hidden');
+        document.getElementById('quiz-results').classList.remove('hidden');
+    }
+
+    function resetQuiz() {
+        AppState.activeQuiz = null;
+        AppState.quizAnswers = [];
+        AppState.currentQuestionIndex = 0;
+        AppState.quizMode = 'quiz';
+
+        if (AppState.quizTimer) {
+            clearInterval(AppState.quizTimer);
+            AppState.quizTimer = null;
+        }
+    }
+
+    // Utility function for debouncing events
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+</script>
+</body>
+</html>
