@@ -33,7 +33,7 @@ digireach/
 │ └── images/ # Application images
 └── netlify.toml # Netlify configuration (if needed)
 
-Copy
+
 
 ## Getting Started
 
